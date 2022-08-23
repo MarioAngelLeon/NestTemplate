@@ -23,6 +23,7 @@ import {
   BadRequestCreateUdi,
   createOkResponse,
 } from './dto/response/responses-udi';
+import { GetByDateParams } from './dto/request/get-udi.dto';
 
 @ApiTags('Udi')
 @Controller('udis')
@@ -39,7 +40,6 @@ export class UdisController {
   })
   @Post()
   create(@Body() createUdiDto: CreateUdiDto) {
-    console.log('perro: ', createUdiDto);
     return this.udisService.create(createUdiDto);
   }
 
@@ -53,6 +53,12 @@ export class UdisController {
   @Get('/banxico')
   async getUdisFromBanxico() {
     return await this.udisService.getFromBanxico();
+  }
+
+  @ApiOperation({ summary: 'Method to get Udis by date' })
+  @Get('/banxico/:date')
+  async getUdisByDate(@Param() params: GetByDateParams) {
+    return await this.udisService.getUdisByDate(params);
   }
 
   @ApiOperation({ summary: 'Method to get an Udi' })

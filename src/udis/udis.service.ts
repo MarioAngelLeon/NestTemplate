@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -6,6 +10,7 @@ import { customAxios } from 'src/common/axios/axiosInterceptor';
 import { CreateUdiDto } from './dto/request/create-udi.dto';
 import { UpdateUdiDto } from './dto/request/update-udi.dto';
 import { UdiEntity } from './entities/udi.entity';
+import { GetByDateParams } from './dto/request/get-udi.dto';
 
 @Injectable()
 export class UdisService {
@@ -78,5 +83,40 @@ export class UdisService {
     );
 
     return resp;
+  }
+
+  async getUdisByDate(params: GetByDateParams) {
+    try {
+      let resp = await this.udiRepository
+        .createQueryBuilder('udi')
+        .where('udi.is_active = :active', { active: true })
+        .andWhere('udi.current_date = :date', { date: params?.date })
+        .getOne();
+
+      if (!resp) {
+        resp = await this.udiRepository
+          .createQueryBuilder('udi')
+          .where('udi.is_active = :active', { active: true })
+          .orderBy('udi.current_date', 'DESC')
+          .getOne();
+      }
+
+      if (!resp) {
+        throw new NotFoundException('Aun no hay información cargada');
+      }
+
+      return {
+        status_code: 200,
+        payload: [
+          {
+            id: resp?.id,
+            value: resp?.value,
+            date: resp?.currentDate,
+          },
+        ],
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error?.message || error);
+    }
   }
 }
