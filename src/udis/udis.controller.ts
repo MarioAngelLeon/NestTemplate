@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -24,6 +25,7 @@ import {
   createOkResponse,
 } from './dto/response/responses-udi';
 import { GetByDateParams } from './dto/request/get-udi.dto';
+import { FormatResponseInterceptor } from 'src/interceptor/response.interceptor';
 
 @ApiTags('Udi')
 @Controller('udis')
@@ -44,24 +46,28 @@ export class UdisController {
   }
 
   @ApiOperation({ summary: 'Method to get all Udis' })
+  @UseInterceptors(FormatResponseInterceptor)
   @Get()
   findAll() {
     return this.udisService.findAll();
   }
 
   @ApiOperation({ summary: 'Method to get Udis from Banxico' })
+  @UseInterceptors(FormatResponseInterceptor)
   @Get('/banxico')
   async getUdisFromBanxico() {
     return await this.udisService.getFromBanxico();
   }
 
   @ApiOperation({ summary: 'Method to get Udis by date' })
+  @UseInterceptors(FormatResponseInterceptor)
   @Get('/banxico/:date')
   async getUdisByDate(@Param() params: GetByDateParams) {
     return await this.udisService.getUdisByDate(params);
   }
 
   @ApiOperation({ summary: 'Method to get an Udi' })
+  @UseInterceptors(FormatResponseInterceptor)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.udisService.findOne(+id);

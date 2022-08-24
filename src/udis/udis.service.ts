@@ -106,14 +106,9 @@ export class UdisService {
       }
 
       return {
-        status_code: 200,
-        payload: [
-          {
-            id: resp?.id,
-            value: resp?.value,
-            date: resp?.currentDate,
-          },
-        ],
+        id: resp?.id,
+        value: resp?.value,
+        date: resp?.currentDate,
       };
     } catch (error) {
       throw new InternalServerErrorException(error?.message || error);
